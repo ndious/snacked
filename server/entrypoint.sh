@@ -4,6 +4,8 @@ set -e
 # Remove a potentially pre-existing server.pid for Rails.
 rm -f /snacked/tmp/pids/server.pid
 
+echo $(ls -1 /snacked)
+
 echo "bundle install..."
 bundle check || bundle install --jobs 4
 

@@ -7,15 +7,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# RUN npm install --global yarn tod-cli
-
 WORKDIR /snacked
-COPY code/Gemfile /snacked/Gemfile
-COPY code/Gemfile.lock /snacked/Gemfile.lock
+COPY ./Gemfile /snacked/Gemfile
+COPY ./Gemfile.lock /snacked/Gemfile.lock
 
 RUN bundle install
 
-COPY code/entrypoint.sh /usr/bin/
+COPY ./entrypoint.sh /usr/bin/
+RUN echo $(ls -1 /snacked)
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 3000
