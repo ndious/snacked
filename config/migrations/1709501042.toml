@@ -1,0 +1,13 @@
+[migration]
+up = '''
+CREATE TABLE ingredients (
+	id SERIAL PRIMARY KEY,
+	recipe_id INTEGER NOT NULL,
+	name TEXT NOT NULL,
+	quantity INTEGER NOT NULL
+);
+'''
+
+down = '''
+DROP TABLE IF EXISTS ingredients;
+'''

@@ -1,0 +1,15 @@
+.tmp/
+.vs_code/
+
+vendor/
+
+testdata/
+
+*/*_templ.go
+*/**/*_templ.go
+
+assets/generated/*
+!assets/generated/styles/.keep
+
+assets/node_modules
+

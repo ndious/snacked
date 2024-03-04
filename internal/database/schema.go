@@ -1,0 +1,25 @@
+package database
+
+var Schema = `
+
+CREATE TABLE IF NOT EXISTS steps (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	recipe_id INTEGER NOT NULL,
+	body TEXT NOT NULL,
+	duration INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ingredients (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	recipe_id INTEGER NOT NULL,
+	name TEXT NOT NULL,
+	quantity TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS step_ingredients (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	step_id INTEGER NOT NULL,
+	ingredient_id INTEGER NOT NULL,
+	quantity INTEGER NOT NULL
+);
+`

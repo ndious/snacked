@@ -1,0 +1,13 @@
+[migration]
+up = '''
+CREATE TABLE step_ingredients (
+	id SERIAL PRIMARY KEY,
+	step_id INTEGER NOT NULL,
+	ingredient_id INTEGER NOT NULL,
+	quantity INTEGER NOT NULL
+);
+'''
+
+down = '''
+DROP TABLE IF EXISTS step_ingredients;
+'''

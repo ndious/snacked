@@ -1,0 +1,9 @@
+package components
+
+templ Migrations(files []string) {
+	<div>
+        for _, file := range files {
+            <div>{file}</div>
+        } 
+    </div>
+}

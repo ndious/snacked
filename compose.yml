@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: Sn4ck3d
+      POSTGRES_USER: Sn4ck3d
+      POSTGRES_DB: snacked
+    ports:
+      - 5432:5432
+  snacked:
+    build:
+      context: .
+      dockerfile: ./docker/go/Dockerfile
+      target: dev
+    volumes:
+      - ./:/app:rw,delegated
+      - ./.air.toml:/app:ro
+    ports:
+      - 1337:1337
+      - 2345:2345
+  front:
+    build:
+      context: ./assets
+      dockerfile: ./docker/node/Dockerfile
+    volumes:
+      - ./assets:/app:rw,delegated
