@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker compose exec -it snacked /usr/local/go/bin/go $@

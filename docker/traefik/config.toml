@@ -1,0 +1,37 @@
+[global]
+checkNewVersion = true
+sendAnonymousUsage = false
+
+[api]
+insecure = false
+dashboard = true
+
+[accessLog]
+filePath = "/logs/access.log"
+[accessLog.filters]
+statusCodes = ["200-299", "400-499", "500-599"]
+
+[log]
+level = "DEBUG"
+filePath = "/logs/traefik.log"
+
+
+[entryPoints]
+[entryPoints.web]
+address = ":80"
+[entryPoints.web.http.redirections.entryPoint]
+to = "webscure"
+scheme = "https"
+permanent = true
+priority = 1
+[entryPoints.websecure]
+address = ":443"
+
+[providers]
+[providers.docker]
+endpoint = "unix:///var/run/docker.sock"
+exposedByDefault = false
+network = "proxy"
+[providers.file]
+filename = "/etc/traefik/traefik.d/config.toml"
+watch = true

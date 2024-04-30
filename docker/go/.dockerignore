@@ -1,0 +1,7 @@
+.git
+.gitignore
+Makefile
+compose.yml
+.vscode
+docker
+**/*_templ.go

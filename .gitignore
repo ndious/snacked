@@ -1,15 +1,14 @@
 .tmp/
 .vs_code/
 
-vendor/
+.env.local
+**/.env.local
 
-testdata/
+/compose.yml
+/docker-compose.yml
 
-*/*_templ.go
-*/**/*_templ.go
+vendor
+node_modules
+testdata
 
-assets/generated/*
-!assets/generated/styles/.keep
-
-assets/node_modules
-
+**/*_templ.go

@@ -1,5 +1,6 @@
-FROM golang:1.22-alpine AS base
-WORKDIR /app
+FROM golang:alpine AS base
+
+WORKDIR /usr/src/app
 
 ENV GO111MODULE="on"
 ENV GOOS="linux"
@@ -13,14 +14,22 @@ RUN apk update \
     build-base \
     && update-ca-certificates
 
-### Development with hot reload and debugger
+RUN go install github.com/a-h/templ/cmd/templ@latest
+
+COPY ./../../go.mod ./
+COPY ./../../go.sum ./
+RUN go mod download && \
+    go mod verify
+
+##
+# Development with hot reload and debugger
+###
 FROM base AS dev
 WORKDIR /app
 
 # Hot reloading mod
 RUN go install github.com/cosmtrek/air@latest && \
-    go install github.com/go-delve/delve/cmd/dlv@latest && \
-    go install github.com/a-h/templ/cmd/templ@latest
+    go install github.com/go-delve/delve/cmd/dlv@latest
 
 # RUN CGO_ENABLED=1 go install github.com/mattn/go-sqlite3@latest
 
@@ -29,14 +38,26 @@ EXPOSE 2345
 
 ENTRYPOINT ["air"]
 
-### Executable builder
+##
+# Test runner config
+###
+FROM base AS test-watch
+
+WORKDIR /app
+
+RUN go install github.com/meian/gowatch@latest
+
+ENTRYPOINT ["gowatch", "test"]
+
+
+##
+# Executable builder
+###
 FROM base AS builder
 WORKDIR /app
 
 # Application dependencies
 COPY . /app
-RUN go mod download && \
-    go mod verify
 
 RUN go build -o snacked -a .
 
@@ -45,9 +66,9 @@ FROM alpine:latest
 
 RUN apk update && \
     apk add --no-cache \
-        ca-certificates \
-        curl \
-        tzdata && \
+    ca-certificates \
+    curl \
+    tzdata && \
     update-ca-certificates
 
 # Copy executable

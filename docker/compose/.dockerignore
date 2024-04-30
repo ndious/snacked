@@ -2,6 +2,5 @@
 .gitignore
 Makefile
 compose.yml
-.air.toml
 .vscode
 docker

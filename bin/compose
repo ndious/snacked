@@ -1,0 +1,16 @@
+#!/bin/bash
+
+ENV=${1:-dev}
+#
+# if [ ! -f docker/compose/${ENV}.yml ]; then
+#   echo -e "\033[31m [x] \033[0m Environment ${ENV} not found"
+#   exit 1
+# fi
+
+docker compose \
+    --env-file docker/compose/.env \
+    --env-file docker/compose/.env.local \
+    --file docker/compose/compose.yml \
+    config > compose.yml
+
+echo -e "\033[32m [\xE2\x9C\x94] \033[0m docker-compose builded for ${ENV} environment"

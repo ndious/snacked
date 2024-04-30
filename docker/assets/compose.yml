@@ -1,0 +1,19 @@
+version: "3.8"
+
+volumes:
+  generated-data:
+
+services:
+  assets:
+    build:
+      context: "${ASSETS_DIR}"
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - "${ROOT_DIR}/assets/static.ts:${APP_DIR}/static.ts:ro"
+      - "${ROOT_DIR}/assets/css:${APP_DIR}/css:ro"
+      - "generated-data:${APP_DIR}/generated:rw"
+      - "${ROOT_DIR}/internal:${APP_DIR}/src:ro"
+      - "${ASSETS_DIR}/package.json:${APP_DIR}/package.json:rw,delegated"
+      - "${ASSETS_DIR}/node_modules:${APP_DIR}/node_modules:rw,delegated"
+      - "${VAR_DIR}/log/assets:${APP_DIR}/log:rw,delegated"

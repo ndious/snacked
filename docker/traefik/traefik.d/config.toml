@@ -1,0 +1,103 @@
+##
+# HTTP SERVICES
+###
+[http]
+[http.routers.redirect-to-secure]
+rule = "Host(`www.snacked.localhost`)"
+entryPoints = ["web"]
+service = "redirect-to-secure"
+middlewares = ["https-redirect", "snacked-secureheaders"]
+
+[http.services.redirect-to-secure.loadBalancer]
+[[http.services.redirect-to-secure.loadBalancer.servers]]
+url = "https://www.snacked.localhost"
+
+##
+# Assets server
+###
+[http.routers.assets]
+rule = "Host(`www.slowfin.localhost`) && Path(`/assets`)"
+service = "assets"
+entryPoints = ["websecure"]
+middlewares = ["https-redirect", "snacked-secureheaders"]
+[[http.routers.assets.tls.domains]]
+main = 'snacked.localhost'
+sans = ['www.snacked.localhost']
+
+[http.services.assets.loadBalancer]
+[[http.services.assets.loadBalancer.servers]]
+url = "http://assets:3000"
+
+##
+# Snacked GO server
+###
+[http.routers.snacked]
+rule = "Host(`www.slowfin.localhost`)"
+service = "snacked"
+entryPoints = ["websecure"]
+middlewares = ["https-redirect", "snacked-secureheaders"]
+[[http.routers.snacked.tls.domains]]
+main = 'snacked.localhost'
+sans = ['www.snacked.localhost']
+
+[http.services.snacked.loadBalancer]
+[[http.services.snacked.loadBalancer.servers]]
+url = "http://snacked:1337"
+
+
+##
+# Traefik dashboard
+###
+[http.routers.traefik-dashboard]
+rule = "Host(`traefik.snacked.localhost`)"
+service = "dashboard@internal"
+entryPoints = ["websecure"]
+middlewares = ["https-redirect", "snacked-secureheaders"]
+[[http.routers.traefik-dashboard.tls.domains]]
+main = "snacked.localhost"
+sans = ["traefik.snacked.localhost"]
+
+
+##
+# Traefik API
+###
+[http.routers.traefik-api]
+rule = "Host(`traefik.snacked.localhost`) && PathPrefix(`/api`)"
+service = "api@internal"
+entryPoints = ["websecure"]
+middlewares = ["https-redirect", "slowfin-tech-secureheaders"]
+[[http.routers.traefik-api.tls.domains]]
+main = "snacked.localhost"
+sans = ["traefik.snacked.localhost"]
+
+
+##
+# Middlewares
+###
+[http.middlewares]
+[http.middlewares.https-redirect]
+[http.middlewares.https-redirect.redirectScheme]
+scheme = "https"
+permanent = true
+
+
+[http.middlewares.snacked-secureheaders]
+[http.middlewares.snacked-secureheaders.headers]
+sslRedirect = true
+stsSeconds = 15768000
+stsIncludeSubdomains = true
+stsPreload = true
+forceSTSHeader = true
+sslHost = "snacked.localhost"
+customFrameOptionsValue = "allow-from https://www.snacked.localhost"
+
+
+##
+# TLS CONFIGURATION
+###
+[tls]
+[tls.options.default]
+minVersion = "VersionTLS12"
+[[tls.certificates]]
+certFile = "/etc/certs/local-cert.pem"
+keyFile = "/etc/certs/local-key.pem"
