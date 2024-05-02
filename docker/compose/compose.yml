@@ -4,9 +4,13 @@ name: snacked
 
 volumes:
   air-data:
+  generated-data:
 
-include:
-  - "${ASSETS_DIR}/compose.yml"
+networks:
+  snacked_proxy:
+    name: snacked_proxy
+    driver: bridge
+    external: false
 
 services:
   traefik:
@@ -22,12 +26,31 @@ services:
         mode: host
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "${TRAEFIK_DIR}/traefik/traefik.toml:/etc/traefik/traefik.toml:ro"
-      - "${TRAEFIK_DIR}/traefik/traefik.d:/etc/traefik/traefik.d:ro"
+      - "${TRAEFIK_DIR}/traefik.toml:/etc/traefik/traefik.toml:ro"
+      - "${TRAEFIK_DIR}/traefik.d:/etc/traefik/traefik.d:ro"
       - "${VAR_DIR}/log/traefik:/logs"
       - "${VAR_DIR}/certs:/etc/certs:ro"
     labels:
       - "traefik.http.routers.traefik-dashboard=true"
+    networks:
+      - snacked_proxy
+
+  assets:
+    extends:
+      file: "${ASSETS_DIR}/compose.yml"
+      service: assets
+    labels:
+      - "traefik.http.routers.assets=true"
+      - "traefik.docker.network=snacked_proxy"
+    volumes:
+      - "${ROOT_DIR}/assets/css:${APP_DIR}/css:ro"
+      - "${VAR_DIR}/log/assets:${APP_DIR}/log:rw,delegated"
+      - "generated-data:${APP_DIR}/generated:rw"
+      - "${ROOT_DIR}/internal:${APP_DIR}/src:ro"
+    ports:
+      - 45537:45537
+    networks:
+      - snacked_proxy
 
   db:
     image: postgres:alpine
@@ -40,8 +63,8 @@ services:
 
   snacked:
     build:
-      context: "${GO_DIR}"
-      dockerfile: Dockerfile
+      context: "${ROOT_DIR}"
+      dockerfile: "./docker/go/Dockerfile"
       target: dev
     volumes:
       - "${ROOT_DIR}/internal:${APP_DIR}/internal:rw,delegated"
@@ -58,8 +81,8 @@ services:
 
   tests:
     build:
-      context: "${GO_DIR}"
-      dockerfile: Dockerfile
+      context: "${ROOT_DIR}"
+      dockerfile: "./docker/go/Dockerfile"
       target: test-watch
     volumes:
       - "${ROOT_DIR}/internal:${APP_DIR}/internal:ro"

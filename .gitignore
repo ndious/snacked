@@ -12,3 +12,6 @@ node_modules
 testdata
 
 **/*_templ.go
+
+var/log
+var/certs

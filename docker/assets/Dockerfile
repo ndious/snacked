@@ -6,7 +6,8 @@ WORKDIR /usr/src/app
 FROM base AS install
 
 RUN mkdir -p /temp/dev
-COPY package.json bun.lockb[t] /temp/dev/
+COPY package.json bun.lockb /temp/dev/
+COPY static.ts /usr/src/app/
 RUN cd /temp/dev && bun install --frozen-lockfile
 
 # install with --production (exclude devDependencies)
@@ -18,7 +19,7 @@ FROM base AS dev
 COPY --from=install /temp/dev/node_modules node_modules
 ENV NODE_ENV=development
 
-ENTRYPOINT [ "bun", "run", "dev" ]
+ENTRYPOINT [ "bun", "--watch", "run", "static.ts" ]
 
 # copy node_modules from temp directory
 # then copy all (non-ignored) project files into the image

@@ -13,26 +13,10 @@ middlewares = ["https-redirect", "snacked-secureheaders"]
 url = "https://www.snacked.localhost"
 
 ##
-# Assets server
-###
-[http.routers.assets]
-rule = "Host(`www.slowfin.localhost`) && Path(`/assets`)"
-service = "assets"
-entryPoints = ["websecure"]
-middlewares = ["https-redirect", "snacked-secureheaders"]
-[[http.routers.assets.tls.domains]]
-main = 'snacked.localhost'
-sans = ['www.snacked.localhost']
-
-[http.services.assets.loadBalancer]
-[[http.services.assets.loadBalancer.servers]]
-url = "http://assets:3000"
-
-##
 # Snacked GO server
 ###
 [http.routers.snacked]
-rule = "Host(`www.slowfin.localhost`)"
+rule = "Host(`www.snacked.localhost`)"
 service = "snacked"
 entryPoints = ["websecure"]
 middlewares = ["https-redirect", "snacked-secureheaders"]
@@ -44,6 +28,22 @@ sans = ['www.snacked.localhost']
 [[http.services.snacked.loadBalancer.servers]]
 url = "http://snacked:1337"
 
+
+##
+# Assets server
+###
+[http.routers.assets]
+rule = "Host(`www.snacked.localhost`) && PathPrefix(`/assets`)"
+service = "assets"
+entryPoints = ["websecure"]
+middlewares = ["https-redirect", "snacked-secureheaders"]
+[[http.routers.assets.tls.domains]]
+main = 'snacked.localhost'
+sans = ['www.snacked.localhost']
+
+[http.services.assets.loadBalancer]
+[[http.services.assets.loadBalancer.servers]]
+url = "http://assets:45537"
 
 ##
 # Traefik dashboard
@@ -65,7 +65,7 @@ sans = ["traefik.snacked.localhost"]
 rule = "Host(`traefik.snacked.localhost`) && PathPrefix(`/api`)"
 service = "api@internal"
 entryPoints = ["websecure"]
-middlewares = ["https-redirect", "slowfin-tech-secureheaders"]
+middlewares = ["https-redirect", "snacked-secureheaders"]
 [[http.routers.traefik-api.tls.domains]]
 main = "snacked.localhost"
 sans = ["traefik.snacked.localhost"]

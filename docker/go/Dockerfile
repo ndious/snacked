@@ -16,8 +16,8 @@ RUN apk update \
 
 RUN go install github.com/a-h/templ/cmd/templ@latest
 
-COPY ./../../go.mod ./
-COPY ./../../go.sum ./
+COPY ./go.mod ./
+COPY ./go.sum ./
 RUN go mod download && \
     go mod verify
 
@@ -25,7 +25,7 @@ RUN go mod download && \
 # Development with hot reload and debugger
 ###
 FROM base AS dev
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Hot reloading mod
 RUN go install github.com/cosmtrek/air@latest && \
@@ -43,7 +43,7 @@ ENTRYPOINT ["air"]
 ###
 FROM base AS test-watch
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 RUN go install github.com/meian/gowatch@latest
 
@@ -54,7 +54,7 @@ ENTRYPOINT ["gowatch", "test"]
 # Executable builder
 ###
 FROM base AS builder
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Application dependencies
 COPY . /app
