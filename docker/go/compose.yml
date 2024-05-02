@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  go:
+    build:
+      context: "${ROOT_DIR}"
+      dockerfile: "./docker/go/Dockerfile"
+      target: build
+    volumes:
+      - "${ROOT_DIR}/internal:${APP_DIR}/internal:rw,delegated"
+      - "${ROOT_DIR}/cmd:${APP_DIR}/cmd:rw,delegated"
+      - "${ROOT_DIR}/config:${APP_DIR}/config:ro"
+      - "${ROOT_DIR}/go.mod:${APP_DIR}/go.mod:rw,delegated"
+      - "${ROOT_DIR}/go.sum:${APP_DIR}/go.sum:rw,delegated"

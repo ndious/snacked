@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 ENV GO111MODULE="on"
 ENV GOOS="linux"
-ENV CGO_ENABLED=1
+ENV CGO_ENABLED=0
 
 # System dependencies
 RUN apk update \
@@ -14,13 +14,6 @@ RUN apk update \
     build-base \
     && update-ca-certificates
 
-RUN go install github.com/a-h/templ/cmd/templ@latest
-
-COPY ./go.mod ./
-COPY ./go.sum ./
-RUN go mod download && \
-    go mod verify
-
 ##
 # Development with hot reload and debugger
 ###
@@ -29,9 +22,16 @@ WORKDIR /usr/src/app
 
 # Hot reloading mod
 RUN go install github.com/cosmtrek/air@latest && \
-    go install github.com/go-delve/delve/cmd/dlv@latest
+    go install github.com/go-delve/delve/cmd/dlv@latest && \
+    go install github.com/a-h/templ/cmd/templ@latest
 
-# RUN CGO_ENABLED=1 go install github.com/mattn/go-sqlite3@latest
+COPY ./go.mod ./go.sum ./
+RUN go mod download
+
+COPY ./internal ./internal
+COPY ./cmd ./cmd
+COPY ./docker/go/.air.toml ./.air.toml
+RUN go build -o . ./cmd/www
 
 EXPOSE 1337
 EXPOSE 2345
@@ -47,32 +47,8 @@ WORKDIR /usr/src/app
 
 RUN go install github.com/meian/gowatch@latest
 
+COPY ./go.mod ./go.sum ./
+RUN go mod download && \
+    go mod verify
+
 ENTRYPOINT ["gowatch", "test"]
-
-
-##
-# Executable builder
-###
-FROM base AS builder
-WORKDIR /usr/src/app
-
-# Application dependencies
-COPY . /app
-
-RUN go build -o snacked -a .
-
-### Production
-FROM alpine:latest
-
-RUN apk update && \
-    apk add --no-cache \
-    ca-certificates \
-    curl \
-    tzdata && \
-    update-ca-certificates
-
-# Copy executable
-COPY --from=builder /app/snacked /usr/local/bin/snacked
-EXPOSE 8080
-
-ENTRYPOINT ["/usr/local/bin/snacked"]

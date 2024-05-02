@@ -3,12 +3,15 @@ version: "3.8"
 name: snacked
 
 volumes:
-  air-data:
-  generated-data:
+  generated_data:
 
 networks:
   snacked_proxy:
     name: snacked_proxy
+    driver: bridge
+    external: false
+  snacked_internal:
+    name: snacked_internal
     driver: bridge
     external: false
 
@@ -39,18 +42,18 @@ services:
     extends:
       file: "${ASSETS_DIR}/compose.yml"
       service: assets
-    labels:
-      - "traefik.http.routers.assets=true"
-      - "traefik.docker.network=snacked_proxy"
     volumes:
       - "${ROOT_DIR}/assets/css:${APP_DIR}/css:ro"
       - "${VAR_DIR}/log/assets:${APP_DIR}/log:rw,delegated"
-      - "generated-data:${APP_DIR}/generated:rw"
+      - "generated_data:${APP_DIR}/generated:rw"
       - "${ROOT_DIR}/internal:${APP_DIR}/src:ro"
     ports:
       - 45537:45537
     networks:
       - snacked_proxy
+    labels:
+      - "traefik.http.routers.assets=true"
+      - "traefik.docker.network=snacked_proxy"
 
   db:
     image: postgres:alpine
@@ -58,36 +61,37 @@ services:
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_DB: "${DB}"
+    networks:
+      - snacked_internal
     ports:
       - 5432:5432
 
   snacked:
+    extends:
+      file: "${GO_DIR}/compose.yml"
+      service: go
     build:
-      context: "${ROOT_DIR}"
-      dockerfile: "./docker/go/Dockerfile"
       target: dev
     volumes:
-      - "${ROOT_DIR}/internal:${APP_DIR}/internal:rw,delegated"
-      - "${ROOT_DIR}/config:${APP_DIR}/config:ro"
-      - "${ROOT_DIR}/go.mod:${APP_DIR}/go.mod:rw,delegated"
-      - "${ROOT_DIR}/go.sum:${APP_DIR}/go.sum:rw,delegated"
-      - "${GO_DIR}/vendor:${APP_DIR}/vendor:rw,delegated"
-      - "air-data:${APP_DIR}/.tmp:rw,delegated"
       - "${GO_DIR}/.air.toml:${APP_DIR}/.air.toml:ro"
       - "${VAR_DIR}/log/snacked:${APP_DIR}/log:rw,delegated"
     ports:
       - 1337:1337
       - 2345:2345
+    depends_on:
+      - db
+    networks:
+      - snacked_proxy
+      - snacked_internal
+    labels:
+      - "traefik.http.routers.snacked=true"
+      - "traefik.docker.network=snacked_proxy"
 
   tests:
+    extends:
+      file: "${GO_DIR}/compose.yml"
+      service: go
     build:
-      context: "${ROOT_DIR}"
-      dockerfile: "./docker/go/Dockerfile"
       target: test-watch
     volumes:
-      - "${ROOT_DIR}/internal:${APP_DIR}/internal:ro"
-      - "${ROOT_DIR}/config:${APP_DIR}/config:ro"
-      - "${ROOT_DIR}/go.mod:${APP_DIR}/go.mod:ro"
-      - "${ROOT_DIR}/go.sum:${APP_DIR}/go.sum:ro"
-      - "${GO_DIR}/vendor:${APP_DIR}/vendor:ro"
       - "${VAR_DIR}/log/tests:${APP_DIR}/log:rw,delegated"

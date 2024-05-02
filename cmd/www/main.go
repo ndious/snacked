@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/a-h/templ"
-	"github.com/ndious/snacked/internal"
 	cmp "github.com/ndious/snacked/internal/components"
 	"github.com/ndious/snacked/internal/database"
 )
@@ -20,14 +19,6 @@ func main() {
 	os.Setenv("BASEDIR", filepath.Dir(exepath))
 
 	mux := http.NewServeMux()
-
-	mux.Handle(
-		"/statics/",
-		http.StripPrefix(
-			"/statics/",
-			http.FileServer(http.Dir(internal.GetDir("assets"))),
-		),
-	)
 
 	mux.HandleFunc("GET /migrate", func(w http.ResponseWriter, r *http.Request) {
 		migrations, err := database.Migrate()
