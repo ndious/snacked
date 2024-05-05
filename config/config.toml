@@ -2,5 +2,5 @@
 user = "Sn4ck3d"
 password = "Sn4ck3d"
 database = "snacked"
-url = "127.0.0.1"
+url = "db"
 port = 5432

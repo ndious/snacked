@@ -1,0 +1,13 @@
+package layout
+
+templ Page(body templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		@Head()
+		<body>
+			<div class="wrapper">
+				@body
+			</div>
+		</body>
+	</html>
+}

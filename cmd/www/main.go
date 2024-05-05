@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/a-h/templ"
 	cmp "github.com/ndious/snacked/internal/components"
+	"github.com/ndious/snacked/internal/components/layout"
 	"github.com/ndious/snacked/internal/database"
 )
 
@@ -29,7 +29,10 @@ func main() {
 		cmp.Migrations(migrations).Render(r.Context(), w)
 	})
 
-	mux.Handle("GET /", templ.Handler(cmp.Hello("dious")))
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		c := cmp.Hello("Dious")
+		layout.Page(c).Render(r.Context(), w)
+	})
 
 	http.ListenAndServe(":1337", mux)
 }

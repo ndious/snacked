@@ -8,7 +8,3 @@ type Route struct {
 	Path    string
 	Handler func(http.ResponseWriter, *http.Request)
 }
-
-func Statics() {
-
-}
