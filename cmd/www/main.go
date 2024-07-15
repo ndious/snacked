@@ -8,6 +8,7 @@ import (
 	cmp "github.com/ndious/snacked/internal/components"
 	"github.com/ndious/snacked/internal/components/layout"
 	"github.com/ndious/snacked/internal/database"
+	"github.com/ndious/snacked/internal/handlers"
 )
 
 func main() {
@@ -19,6 +20,11 @@ func main() {
 	os.Setenv("BASEDIR", filepath.Dir(exepath))
 
 	mux := http.NewServeMux()
+    db := database.GetDb()
+
+    handlers.RecipesRouter(mux, db)
+    handlers.RecipeIngredientsRouter(mux, db)
+    handlers.IngredientsRouter(mux, db)
 
 	mux.HandleFunc("GET /migrate", func(w http.ResponseWriter, r *http.Request) {
 		migrations, err := database.Migrate()
@@ -28,7 +34,7 @@ func main() {
 		}
 		cmp.Migrations(migrations).Render(r.Context(), w)
 	})
-
+ 
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		c := cmp.Hello("Dious")
 		layout.Page(c).Render(r.Context(), w)

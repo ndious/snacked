@@ -1,0 +1,37 @@
+package recipes
+
+import (
+	"github.com/ndious/snacked/internal/models"
+	sh "github.com/ndious/snacked/internal/components/shared"
+)
+
+templ Index(recipes []models.Recipe) {
+	<div>
+		if len(recipes) == 0 {
+			<div class="prose">
+				<h1>No recipes available</h1>
+			</div>
+		} else {
+			<ul>
+				for _, recipe := range recipes {
+					@Recipe(recipe)
+				}
+			</ul>
+		}
+		<a class="btn btn-primary" href="/recipes/new">
+			if len(recipes) == 0 {
+				Create your first Recipe
+			} else {
+				Create a new recipe
+			}
+		</a>
+	</div>
+}
+
+templ Recipe(recipe models.Recipe) {
+	<li>
+		<a href={ sh.URL("/recipes/%d", recipe.ID) }>
+			{ recipe.Title }
+		</a>
+	</li>
+}

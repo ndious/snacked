@@ -1,0 +1,78 @@
+package recipes
+
+import (
+	"fmt"
+
+	"github.com/ndious/snacked/internal/models"
+	ingCmp "github.com/ndious/snacked/internal/components/ingredients"
+	sh "github.com/ndious/snacked/internal/components/shared"
+)
+
+templ FormNew() {
+	<div id="recipes-form" class="prose">
+		<h1>New recipe</h1>
+		<form
+			class="form-control"
+			action="/recipes"
+			method="POST"
+		>
+			<label for="title" class="input input-bordered flex items-center gap-2">
+				Title:
+				<input type="text" id="title" name="title" class="grow" placeholder="My wonderful recipe"/>
+			</label>
+			@submit()
+		</form>
+	</div>
+}
+
+templ FormUpdate(recipe models.Recipe, ingredients []models.RecipeIngredient) {
+	<div class="prose">
+		<h1>My { recipe.Title } recipe</h1>
+		<form
+			class="form-control"
+			hx-put={ sh.HxURL("/recipes/%d", recipe.ID) }
+			hx-replace-url={ sh.HxURL("/recipes/%d", recipe.ID) }
+			hx-trigger="change"
+		>
+			<label for="title" class="input input-bordered flex items-center gap-2">
+				Title:
+				<input type="text" value={ recipe.Title } id="title" name="title" class="grow" placeholder="My wonderful recipe"/>
+			</label>
+			<label for="description" class="form-control">
+				<div class="label">
+					<span class="label-text">Description</span>
+				</div>
+				<textarea
+					class="textarea textarea-bordered"
+					id="description"
+					name="description"
+					placeholder="Delicious and tasty"
+				>
+					{ recipe.Description.String }
+				</textarea>
+			</label>
+		</form>
+		@addInList("ingredients", recipe.ID) {
+			for _, ingredient := range ingredients {
+				@ingCmp.FormUpdate(ingredient)
+			}
+		}
+	</div>
+}
+
+templ addInList(name string, recipeId int) {
+	<div id={ name } class="py-4">
+		{ children... }
+		<button
+			type="button"
+			class="btn"
+			hx-get={ sh.HxURL("/recipes/%d/%s/new", recipeId, name) }
+			hx-target={ fmt.Sprintf("#%s", name) }
+			hx-swap="afterbegin"
+		>Add { name }</button>
+	</div>
+}
+
+templ submit() {
+	<button type="submit">Next</button>
+}

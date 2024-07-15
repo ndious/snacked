@@ -3,7 +3,7 @@ up = '''
 CREATE TABLE recipes (
 	id SERIAL PRIMARY KEY,
 	title TEXT NOT NULL,
-	body TEXT NOT NULL
+	description TEXT NULL
 );
 '''
 

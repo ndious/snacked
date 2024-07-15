@@ -1,0 +1,16 @@
+{
+  "prefix": "/assets",
+  "log": "info",
+  "default": "generated",
+  "vendor": [
+    {
+      "uri": "htmx.org",
+      "dir": "htmx.org/dist"
+    },
+    {
+      "uri": "daisyui",
+      "dir": "daisyui/dist"
+    }
+  ],
+  "port": 45537
+}

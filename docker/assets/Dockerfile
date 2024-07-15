@@ -7,8 +7,10 @@ FROM base AS install
 
 RUN mkdir -p /temp/dev
 COPY package.json bun.lockb /temp/dev/
-COPY static.ts /usr/src/app/
-RUN cd /temp/dev && bun install --frozen-lockfile
+RUN cd /temp/dev && bun install
+
+COPY ./srv ./srv
+COPY ./entrypoint.sh ./entrypoint.sh
 
 # install with --production (exclude devDependencies)
 # RUN mkdir -p /temp/prod
@@ -19,13 +21,12 @@ FROM base AS dev
 COPY --from=install /temp/dev/node_modules node_modules
 ENV NODE_ENV=development
 
-ENTRYPOINT [ "bun", "--watch", "run", "static.ts" ]
+ENTRYPOINT [ "./entrypoint.sh" ]
 
 # copy node_modules from temp directory
 # then copy all (non-ignored) project files into the image
 FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
-COPY . .
 
 # [optional] tests & build
 ENV NODE_ENV=production

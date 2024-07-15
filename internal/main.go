@@ -16,7 +16,7 @@ func GetDir(path string) string {
 
 	switch path {
 	case "migrations":
-		return filepath.Join(base, "config", "migration")
+		return filepath.Join(base, "config", "migrations")
 	case "config":
 		return filepath.Join(base, "config")
 	case "assets":

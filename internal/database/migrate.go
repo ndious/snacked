@@ -27,7 +27,7 @@ func Migrate() ([]string, error) {
 	var filesPath []string
 	var err error
 
-	db := getDb()
+	db := GetDb()
 
 	for _, file := range getMigrationFiles() {
 		var change MigrationFileSchema
@@ -36,7 +36,7 @@ func Migrate() ([]string, error) {
 		filesPath = append(filesPath, file.Name())
 
 		if err := toml.Unmarshal(content, &change); err != nil {
-			return nil, err
+			return nil, err 
 		}
 
 		migrationID := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))

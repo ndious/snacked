@@ -2,9 +2,8 @@
 up = '''
 CREATE TABLE ingredients (
 	id SERIAL PRIMARY KEY,
-	recipe_id INTEGER NOT NULL,
-	name TEXT NOT NULL,
-	quantity INTEGER NOT NULL
+	name VARCHAR(255) NULL,
+    unit VARCHAR(3) NOT NULL
 );
 '''
 

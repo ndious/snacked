@@ -1,0 +1,98 @@
+package ingredients
+
+import (
+	"fmt"
+
+	"github.com/ndious/snacked/internal/models"
+	sh "github.com/ndious/snacked/internal/components/shared"
+)
+
+func formId(ingredient models.RecipeIngredient) string {
+	return fmt.Sprintf("ingredient-%d", ingredient.ID)
+}
+
+templ FormNew(ingredient models.RecipeIngredient) {
+	<form id={ formId(ingredient) }>
+		<label for="name" class="input input-bordered flex items-center gap-2">
+			Name:
+			<input
+				type="text"
+				id={ fmt.Sprintf("name-%d", ingredient.ID) }
+				name="name"
+				class="grow"
+				placeholder="ingredient"
+				hx-get={ sh.HxURL("/recipes/%d/ingredients/search", ingredient.RecipeID) }
+				hx-trigger="keyup[target.value.length > 2]"
+				hx-target={ fmt.Sprintf("#input-ingredient-%d", ingredient.ID) }
+				value={ ingredient.Name }
+			/>
+		</label>
+		<div id={ fmt.Sprintf("input-ingredient-%d", ingredient.ID) }></div>
+	</form>
+}
+
+templ FormCreate(ingredient models.RecipeIngredient) {
+	<form
+		id={ formId(ingredient) }
+		hx-post={ sh.HxURL("/recipes/%d/ingredients/%d", ingredient.RecipeID, ingredient.IngredientID) }
+		hx-trigger="change"
+		hx-target="this"
+		hx-swap="outerHTML"
+		hx-ext="debug"
+	>
+		@inputs(ingredient)
+	</form>
+}
+
+templ FormUpdate(ingredient models.RecipeIngredient) {
+	<form
+		id={ formId(ingredient) }
+		hx-put={ sh.HxURL("/recipes/%d/ingredients/%d", ingredient.RecipeID, ingredient.IngredientID) }
+		hx-trigger="change"
+		hx-target="this"
+		hx-swap="outerHTML"
+	>
+		@inputs(ingredient)
+	</form>
+}
+
+templ inputs(ingredient models.RecipeIngredient) {
+	<div class="flex flex-row gap-2 my-4">
+		<input type="hidden" id="recipe-id" value={ fmt.Sprint(ingredient.RecipeID) }/>
+		<input type="hidden" id="ingredient-id" value={ fmt.Sprint(ingredient.IngredientID) }/>
+		<label for="name" class="input input-bordered flex-1 flex items-center gap-2">
+			Name:
+			<input
+				type="text"
+				disabled
+				id={ fmt.Sprintf("name-%d", ingredient.IngredientID) }
+				name="name"
+				class="grow"
+				placeholder="ingredient"
+				hx-get="/ingredients"
+				hx-trigger="keyup[target.value.length > 2]"
+				hx-target={ fmt.Sprintf("#input-ingredient-%d", ingredient.IngredientID) }
+				value={ ingredient.Name }
+				hx-ext="debug"
+			/>
+		</label>
+		<div id={ fmt.Sprintf("input-ingredient-%d", ingredient.IngredientID) }></div>
+		<label for="quantity" class="input input-bordered flex items-center gap-2">
+			Quatity:
+			<input
+				type="text"
+				class="w-24"
+				id="quantity"
+				name="quantity"
+				value={ fmt.Sprint(ingredient.Quantity) }
+			/>
+			<span class="badge">{ fmt.Sprint(ingredient.Unit) }</span>
+		</label>
+		<button
+			type="button"
+			class="btn btn-warning text-lg text-white"
+			hx-delete={ sh.HxURL("/recipes/%d/ingredients/%d", ingredient.RecipeID, ingredient.IngredientID) }
+			hx-target={ formId(ingredient) }
+		>X</button>
+	</div>
+}

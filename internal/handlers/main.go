@@ -1,10 +1,18 @@
-package routes
+package handlers
 
 import (
 	"net/http"
+
+	"github.com/jmoiron/sqlx"
 )
 
-type Route struct {
-	Path    string
-	Handler func(http.ResponseWriter, *http.Request)
+type Router struct {
+    router *http.ServeMux
+    db *sqlx.DB
 }
+
+func handleError(err error, w http.ResponseWriter) {
+    w.WriteHeader(http.StatusInternalServerError)
+    w.Write([]byte(err.Error()))
+}
+

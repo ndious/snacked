@@ -3,8 +3,8 @@ up = '''
 CREATE TABLE steps (
 	id SERIAL PRIMARY KEY,
 	recipe_id INTEGER NOT NULL,
-	body TEXT NOT NULL,
-	duration INTEGER NOT NULL
+	description TEXT NULL,
+	duration INTEGER NULL
 );
 '''
 

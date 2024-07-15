@@ -5,7 +5,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func getDb() *sqlx.DB {
+func GetDb() *sqlx.DB {
 	db, err := sqlx.Connect("postgres", "user=Sn4ck3d dbname=snacked sslmode=disable password=Sn4ck3d host=db")
 
 	if err != nil {

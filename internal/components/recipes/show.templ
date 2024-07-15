@@ -1,0 +1,19 @@
+package recipes
+
+import (
+	"fmt"
+
+	"github.com/ndious/snacked/internal/models"
+	sh "github.com/ndious/snacked/internal/components/shared"
+)
+
+templ Show(recipe models.Recipe, ingredients []models.RecipeIngredient) {
+	<div>
+		<h1>{ recipe.Title }</h1>
+		<p>{ recipe.Description.String }</p>
+		for _, ingredient := range(ingredients) {
+			<p>{ ingredient.Name } { fmt.Sprint(ingredient.Quantity) }{ fmt.Sprint(ingredient.Unit) }</p>
+		}
+		<a class="btn btn-primary" href={ sh.URL("/recipes/%d/edit", recipe.ID) }>Edit</a>
+	</div>
+}

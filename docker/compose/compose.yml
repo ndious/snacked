@@ -1,5 +1,3 @@
-version: "3.8"
-
 name: snacked
 
 volumes:
@@ -43,10 +41,14 @@ services:
       file: "${ASSETS_DIR}/compose.yml"
       service: assets
     volumes:
-      - "${ROOT_DIR}/assets/css:${APP_DIR}/css:ro"
-      - "${VAR_DIR}/log/assets:${APP_DIR}/log:rw,delegated"
-      - "generated_data:${APP_DIR}/generated:rw"
-      - "${ROOT_DIR}/internal:${APP_DIR}/src:ro"
+      - "${ROOT_DIR}/assets/css:/assets/css"
+      - "${ROOT_DIR}/assets/assets.json:/assets/assets.json"
+      - "${ROOT_DIR}/assets/package.json:/assets/package.json"
+      - "${ROOT_DIR}/assets/tailwind.config.js:/assets/tailwind.config.js"
+      - "${VAR_DIR}/log/assets:/var/log/assets:rw,delegated"
+      - "generated_data:/assets/generated:rw"
+      - "${ROOT_DIR}/assets/favicon:/assets/generated/favicon"
+      - "${ROOT_DIR}/internal:/assets/src:ro"
     ports:
       - 45537:45537
     networks:
@@ -54,6 +56,7 @@ services:
     labels:
       - "traefik.http.routers.assets=true"
       - "traefik.docker.network=snacked_proxy"
+    entrypoint: ["./entrypoint.sh", "-s", "watch"]
 
   db:
     image: postgres:alpine

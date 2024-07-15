@@ -1,0 +1,21 @@
+package ingredients
+
+import (
+	"github.com/ndious/snacked/internal/models"
+	sh "github.com/ndious/snacked/internal/components/shared"
+)
+
+templ SearchList(ingredients []models.Ingredient, recipeId string) {
+	<ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+		for _, ingredient := range(ingredients) {
+			<li>
+				<button
+					hx-trigger="click"
+					hx-target="closest form"
+					hx-get={ sh.HxURL("/recipes/%s/ingredients/%d/new", recipeId, ingredient.ID) }
+					hx-swap="outerHTML"
+				>{ ingredient.Name }</button>
+			</li>
+		}
+	</ul>
+}
